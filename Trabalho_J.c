@@ -460,68 +460,6 @@ int main(int argc, char *argv[])
                     printf("Nao inserido!\n");
 
                 break;
-                int main(int argc, char *argv[])
-{
-    Utilizacao Uti[TAMANHO];
-    int contaPedidos=0;  // contador dos pedidos
-    int tempo, distancia, nif;
-    char codigoU[50];
-    int uinserir, vcodigoU, vdistancia, premov;
-    int numPedido=0;
-    int tempoUtiliz=0;
-
-    Equipamento Equip[TAMANHO];
-    int opcao;
-    int livre=0, autonomia, quantidade=0;
-    char codigoM[50];
-    char tipo[50];
-    float custo;
-    int minserido, mremov, vcodigoM;
-    int sdistancia=autonomia;
-    int entregarm;
-    int cpreco;
-
-    //ler ficheiros e carregar arrays "Uti" e "Equip"
-    quantidade = LerFicheiroEquipamentos(Equip);
-    contaPedidos = LerFicheiroUtilizacao(Uti);
-
-    do {
-        opcao= menu();
-        switch (opcao){
-
-            case 1:      // inserir Equipamento
-                printf("Codigo: ");
-                scanf("%s", codigoM);
-
-                vcodigoM=verificarCodigo(Equip,quantidade,codigoM);
-
-                while (vcodigoM==1){
-                    printf("Esse codigo ja existe\n");
-                    printf("Codigo: ");
-                    scanf("%s", codigoM);
-                    vcodigoM=verificarCodigo(Equip,quantidade,codigoM);
-                }
-
-                printf("Tipo: ");
-                scanf("%s", tipo);
-                printf("Autonomia: ");
-                scanf("%d", &autonomia);
-                printf("Custo: ");
-                scanf("%f", &custo);
-
-                minserido = inserirEquipamento(Equip,quantidade,codigoM,tipo,autonomia,custo);
-                if (minserido == 1)
-                {
-                    printf("Inserido!\n");
-                    quantidade++;
-                    livre++;
-
-                    EscreverFicheiroEquipamentos(Equip, quantidade); //escrever ficheiro equipamentos, j� com o este novo
-                }
-                else
-                    printf("Nao inserido!\n");
-
-                break;
 
             case 2:                   // listar Equipamento
                 listarEquipamento(Equip, quantidade);
