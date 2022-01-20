@@ -149,3 +149,156 @@ int verificarCodigo(Equipamento E[TAMANHO], int qt, char cod[50])
 
   return (0);
 }
+int verificarLivre(Equipamento E[TAMANHO], char cod[50], int qt)
+{
+  
+  int a;
+
+  for (a = 0; a < qt; a++){
+    if (strcmp(E[a].codigo,cod)==0 && E[a].livre==1)
+        return (1);
+  }
+  printf("Nao esta disponivel\n");
+
+  return(0);
+}
+
+int verificarDistancia(Equipamento E[TAMANHO], int qt, int dist, char cod[50])
+{
+  int i;
+  for ( i = 0; i < qt; i++){
+    if (strcmp(E[i].codigo,cod)==0 && E[i].autonomia>=dist)
+      return(1);
+
+  }
+  printf("Escolha uma distancia menor\n");
+
+  return(0);
+}
+
+void listarPedidos(Utilizacao U[TAMANHO], int nPedido)
+{
+  int i;
+  for ( i = 0; i < nPedido; i++)
+  {
+      printf("----------------------\n");
+      printf("Numero de Pedido: %d\n", U[i].nrPedido);
+      printf("NIF: %d\n", U[i].nif);
+      printf("Codigo: %s\n", U[i].codigo);
+      printf("Tempo: %d\n", U[i].tempo);
+      printf("Distancia: %d\n", U[i].distancia);
+      printf("----------------------\n");
+  }
+}
+
+int removerPedidos(Equipamento E[TAMANHO],Utilizacao U[TAMANHO], int qt, int contaPed, int nPedido)
+{
+  int i, a;
+
+  for ( i = 0; i < contaPed; i++){
+
+    if (nPedido == U[i].nrPedido){
+
+      for (a = 0; a < qt; a++){
+        if (strcmp(E[a].codigo, U[i].codigo) == 0) {
+            E[a].livre = 1;
+            break;
+        }
+      }
+
+      if (i == contaPed-1)
+        return (1);
+      else{
+        strcpy(U[i].codigo,U[contaPed-1].codigo);
+        U[i].nif = U[contaPed-1].nif;
+        U[i].tempo = U[contaPed-1].tempo;
+        U[i].distancia = U[contaPed-1].distancia;
+
+        return(1);
+      }
+    }
+  }
+  return (0);
+}
+
+int entregarEquipamento(Utilizacao U[TAMANHO], Equipamento E[TAMANHO], int contaPed, int nPed, int qt, int tempo)
+{
+    int i,a;
+
+    //ciclo para encontrar o pedido
+    for (i = 0; i < contaPed; i++){
+        if (nPed == U[i].nrPedido){
+
+            if (U[i].tempoUtilizado > 0){
+                printf("Este Equipamento ja foi entregue\n");
+            }
+
+            U[i].tempoUtilizado = tempo;
+
+            //dentro do pedido verificar qual o equipamento e marcar como "livre"
+            for (a = 0; a < qt; a++){
+                if (strcmp(E[a].codigo,U[i].codigo)==0){
+                    E[a].livre=1;
+                    printf("Livre: %d\n", E[a].livre);
+                    return(1);
+                }
+            }
+        }
+    }
+
+    printf("Esse Equipamento nao foi requisitada, logo nao pode ser entregue\n");
+
+   return(0);
+}
+
+int calcularPreco(Utilizacao U[TAMANHO], Equipamento E[TAMANHO], int qt, int contaPed, int nPed)
+{
+    int i, a;
+    float preco, precoUtiliz;
+
+    //ciclo para encontrar o pedido
+    for (i = 0; i < contaPed; i++){
+        if (nPed == U[i].nrPedido){
+
+            //dentro do pedido posicionar no equipamento
+            for (a = 0; a < qt; i++){
+                if (strcmp(E[i].codigo,U[i].codigo)==0){
+                    preco= U[i].tempo * E[a].custo;
+                    precoUtiliz= U[i].tempoUtilizado * E[a].custo;
+
+                    printf("Preco a pagar (Tempo Previsto): %d * %.2f = %.2f euros\n", U[i].tempo, E[a].custo, preco);
+                    printf("Preco a pagar (Tempo Utilizado): %d * %.2f = %.2f euros\n", U[i].tempoUtilizado, E[a].custo, precoUtiliz);
+                    return(1);
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+int verTransacoes (Utilizacao U[TAMANHO], Equipamento E[TAMANHO], char cod[50], int contaPed, int qt)
+{
+    int i,a;
+
+    //ciclo para verificar os pedidos do codigo
+    for (i = 0; i < contaPed; i++){
+        if (strcmp(U[i].codigo,cod)==0){
+
+            //dentro do pedido posicionar no equipamento
+            for (a = 0; a < qt; i++){
+                if (strcmp(E[a].codigo,cod)==0){
+                      printf("----------------------\n");
+                      printf("Numero de Pedido: %d\n", U[i].nrPedido);
+                      printf("NIF: %d\n", U[i].nif);
+                      printf("Codigo: %s\n", U[i].codigo);
+                      printf("Tempo Previsto: %d\n", U[i].tempo);
+                      printf("Tempo Utilizado: %d\n", U[i].tempoUtilizado);
+                      printf("Distancia Prevista: %d\n", U[i].distancia);
+                      printf("Autonomia Restante: %d\n", E[a].autonomia);
+                      printf("----------------------\n");
+                      break;
+                }
+            }
+        }
+    }
