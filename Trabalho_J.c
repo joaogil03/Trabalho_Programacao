@@ -460,3 +460,206 @@ int main(int argc, char *argv[])
                     printf("Nao inserido!\n");
 
                 break;
+                int main(int argc, char *argv[])
+{
+    Utilizacao Uti[TAMANHO];
+    int contaPedidos=0;  // contador dos pedidos
+    int tempo, distancia, nif;
+    char codigoU[50];
+    int uinserir, vcodigoU, vdistancia, premov;
+    int numPedido=0;
+    int tempoUtiliz=0;
+
+    Equipamento Equip[TAMANHO];
+    int opcao;
+    int livre=0, autonomia, quantidade=0;
+    char codigoM[50];
+    char tipo[50];
+    float custo;
+    int minserido, mremov, vcodigoM;
+    int sdistancia=autonomia;
+    int entregarm;
+    int cpreco;
+
+    //ler ficheiros e carregar arrays "Uti" e "Equip"
+    quantidade = LerFicheiroEquipamentos(Equip);
+    contaPedidos = LerFicheiroUtilizacao(Uti);
+
+    do {
+        opcao= menu();
+        switch (opcao){
+
+            case 1:      // inserir Equipamento
+                printf("Codigo: ");
+                scanf("%s", codigoM);
+
+                vcodigoM=verificarCodigo(Equip,quantidade,codigoM);
+
+                while (vcodigoM==1){
+                    printf("Esse codigo ja existe\n");
+                    printf("Codigo: ");
+                    scanf("%s", codigoM);
+                    vcodigoM=verificarCodigo(Equip,quantidade,codigoM);
+                }
+
+                printf("Tipo: ");
+                scanf("%s", tipo);
+                printf("Autonomia: ");
+                scanf("%d", &autonomia);
+                printf("Custo: ");
+                scanf("%f", &custo);
+
+                minserido = inserirEquipamento(Equip,quantidade,codigoM,tipo,autonomia,custo);
+                if (minserido == 1)
+                {
+                    printf("Inserido!\n");
+                    quantidade++;
+                    livre++;
+
+                    EscreverFicheiroEquipamentos(Equip, quantidade); //escrever ficheiro equipamentos, j� com o este novo
+                }
+                else
+                    printf("Nao inserido!\n");
+
+                break;
+
+            case 2:                   // listar Equipamento
+                listarEquipamento(Equip, quantidade);
+                break;
+
+            case 3:
+                printf("Codigo: ");
+                scanf("%s", codigoM);
+                mremov = removerEquipamento(Equip, quantidade, codigoM);
+                while (mremov==0){
+                    printf("Esse codigo nao existe\n");
+                    printf("Codigo: ");
+                    scanf("%s", codigoM);
+                    mremov = removerEquipamento(Equip, quantidade, codigoM);
+                }
+                printf("Removido\n");
+                quantidade--;
+
+                EscreverFicheiroEquipamentos(Equip, quantidade); //escrever ficheiro equipamentos, j� sem o equipamento removido
+                break;
+
+            case 4:
+                printf("Codigo: ");
+                scanf("%s", codigoU);
+                vcodigoU=verificarCodigo(Equip,quantidade,codigoU);
+
+                while (vcodigoU==0)
+                {
+                    printf("Nao existe esse codigo\n");
+                    printf("Codigo: ");
+                    scanf("%s", codigoU);
+                    vcodigoU=verificarCodigo(Equip,quantidade,codigoU);
+                }
+
+                vcodigoU=verificarLivre(Equip,codigoU,quantidade);
+                if (vcodigoU == 0){
+                    break;
+                }
+
+                printf("NIF: ");
+                scanf("%d", &nif);
+                printf("Tempo: ");
+                scanf("%d", &tempo);
+                printf("Distancia: ");
+                scanf("%d", &distancia);
+                vdistancia=verificarDistancia(Equip,quantidade,distancia,codigoU);
+
+                while (vdistancia==0)
+                {
+                    printf("Distancia: ");
+                    scanf("%d", &distancia);
+                    vdistancia=verificarDistancia(Equip,quantidade,distancia,codigoU);
+                }
+
+                uinserir = pedidoUtilizacao(Equip, Uti, contaPedidos, nif, codigoU, tempo, distancia, quantidade);
+
+                if (uinserir == 1)
+                {
+                    printf("O pedido foi registado!\n");
+                    contaPedidos++;
+                    sdistancia= sdistancia - distancia;
+
+                    EscreverFicheiroUtilizacao(Uti, contaPedidos); //escrever ficheiro pedidos, j� com o este novo
+                }
+                else
+                    printf("Pedido recusado!\n");
+
+                break;
+
+            case 5:
+                listarPedidos(Uti,contaPedidos);
+                break;
+
+            case 6:
+                printf("Numero do Pedido: ");
+                scanf("%d", &numPedido);
+                premov=removerPedidos(Equip,Uti,quantidade,contaPedidos, numPedido);
+
+                while (premov==0)
+                {
+                    printf("Nao existe esse Pedido\n");
+                    printf("Numero do Pedido: ");
+                    scanf("%d", &numPedido);
+                    premov=removerPedidos(Equip,Uti,quantidade,contaPedidos, numPedido);
+                }
+                printf("Removido\n");
+                contaPedidos--;
+
+                EscreverFicheiroUtilizacao(Uti, contaPedidos); //escrever ficheiro pedidos, j� sem o pedido removido
+                break;
+
+            case 7: // entregar veiculos
+                printf("Numero do Pedido: ");
+                scanf("%d", &numPedido);
+                printf("Tempo utilizado: ");
+                scanf("%d", &tempoUtiliz);
+
+                entregarm=entregarEquipamento(Uti,Equip,contaPedidos,numPedido,quantidade,tempoUtiliz);
+                if (entregarm==0)
+                    break;
+
+                printf("Entregue\n");
+
+                EscreverFicheiroUtilizacao(Uti, contaPedidos); //escrever ficheiro pedidos, j� com o pedido entregue
+                break;
+
+            case 8:
+                printf("Numero do Pedido: ");
+                scanf("%d", &numPedido);
+                cpreco=calcularPreco(Uti,Equip,quantidade,contaPedidos,numPedido);
+
+                while (cpreco==0)
+                {
+                    printf("Numero de ordem: ");
+                    scanf("%d", &numPedido);
+                    cpreco=calcularPreco(Uti,Equip,quantidade,contaPedidos,numPedido);
+                }
+
+                break;
+
+            case 9:
+                // ver transacoes
+                printf("Codigo: ");
+                scanf("%s", codigoM);
+                vcodigoM=verificarCodigo(Equip,quantidade,codigoM);
+
+                if (vcodigoM==0){
+                    printf("Esse codigo nao existe\n");
+                    break;
+                }
+
+                verTransacoes(Uti,Equip,codigoM,contaPedidos, quantidade);
+
+                break;
+
+        }
+    } while (opcao != 0);
+
+    return(0);
+}
+
