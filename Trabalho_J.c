@@ -302,3 +302,161 @@ int verTransacoes (Utilizacao U[TAMANHO], Equipamento E[TAMANHO], char cod[50], 
             }
         }
     }
+return 0;
+}
+
+//fun��o para ler ficheiro equipamentos e carregar o array de Equipamentos
+int LerFicheiroEquipamentos(Equipamento E[TAMANHO]){
+    int i=0;
+
+    FILE * ficheiro;
+
+    ficheiro = fopen("Equipamentos.txt","r");
+
+    if (ficheiro != NULL){ //verificar se o ficheiro existe
+        while ((fgets(E[i].codigo,50, ficheiro) != NULL) && i<1000){
+            E[i].codigo[strlen(E[i].codigo) -1]='\0';
+
+            fgets(E[i].tipo,50, ficheiro);
+            E[i].tipo[strlen(E[i].tipo) -1]='\0';
+
+            fscanf(ficheiro,"%d\n", &E[i].autonomia);
+            fscanf(ficheiro,"%f\n", &E[i].custo);
+            fscanf(ficheiro,"%d\n", &E[i].livre);
+
+            i++;
+        }
+        fclose(ficheiro);
+
+        return i; //para retornar o n� de registos do array
+    }
+
+    return 0;
+}
+
+//fun��o para reescrever o ficheiro com os equipamentos, com o conteudo do array de equipamentos
+void EscreverFicheiroEquipamentos(Equipamento E[TAMANHO], int qt){
+    int i;
+    FILE * ficheiro; //descritor do ficheiro
+
+    ficheiro = fopen("Equipamentos.txt","w"); //abrir ficheiro para escrita
+
+    for (i=0;i<qt;i++){
+        fprintf(ficheiro, "%s\n", E[i].codigo); //1� linha - codigo de equipamento
+        fprintf(ficheiro, "%s\n", E[i].tipo);
+        fprintf(ficheiro, "%d\n", E[i].autonomia);
+        fprintf(ficheiro, "%2f\n", E[i].custo);
+        fprintf(ficheiro, "%d\n", E[i].livre);
+
+    }
+    fclose(ficheiro);
+}
+
+//fun��o para ler ficheiro Pedidos de utiliza��o e carregar a estrutura Utilizacao
+int LerFicheiroUtilizacao(Utilizacao U[TAMANHO]){
+    int i=0;
+
+    FILE * ficheiro;
+
+    ficheiro = fopen("Utilizacao.txt","r");
+
+    if (ficheiro != NULL){ //verificar se o ficheiro existe
+        while ((fgets(U[i].codigo,50, ficheiro) != NULL) && i<1000){
+            U[i].codigo[strlen(U[i].codigo) -1]='\0';
+
+            fscanf(ficheiro,"%d\n", &U[i].nif);
+            fscanf(ficheiro,"%d\n", &U[i].tempo);
+            fscanf(ficheiro,"%d\n", &U[i].tempoUtilizado);
+            fscanf(ficheiro,"%d\n", &U[i].distancia);
+            fscanf(ficheiro,"%d\n", &U[i].nrPedido);
+
+            i++;
+        }
+        fclose(ficheiro);
+
+        return i; //para retornar o n� de registos do array
+    }
+
+    return 0;
+}
+
+//fun��o para reescrever o ficheiro com os pedidos, com o conteudo do array de pedidos de utilizacao
+void EscreverFicheiroUtilizacao(Utilizacao U[TAMANHO], int qt){
+    int i;
+    FILE * ficheiro; //descritor do ficheiro
+
+    ficheiro = fopen("Utilizacao.txt","w"); //abrir ficheiro para escrita
+
+    for (i=0;i<qt;i++){
+        fprintf(ficheiro, "%s\n", U[i].codigo); //1� linha - codigo de equipamento
+        fprintf(ficheiro, "%d\n", U[i].nif);
+        fprintf(ficheiro, "%d\n", U[i].tempo);
+        fprintf(ficheiro, "%d\n", U[i].tempoUtilizado);
+        fprintf(ficheiro, "%d\n", U[i].distancia);
+        fprintf(ficheiro, "%d\n", U[i].nrPedido);
+    }
+    fclose(ficheiro);
+}
+
+int main(int argc, char *argv[])
+{
+    Utilizacao Uti[TAMANHO];
+    int contaPedidos=0;  // contador dos pedidos
+    int tempo, distancia, nif;
+    char codigoU[50];
+    int uinserir, vcodigoU, vdistancia, premov;
+    int numPedido=0;
+    int tempoUtiliz=0;
+
+    Equipamento Equip[TAMANHO];
+    int opcao;
+    int livre=0, autonomia, quantidade=0;
+    char codigoM[50];
+    char tipo[50];
+    float custo;
+    int minserido, mremov, vcodigoM;
+    int sdistancia=autonomia;
+    int entregarm;
+    int cpreco;
+
+    //ler ficheiros e carregar arrays "Uti" e "Equip"
+    quantidade = LerFicheiroEquipamentos(Equip);
+    contaPedidos = LerFicheiroUtilizacao(Uti);
+
+    do {
+        opcao= menu();
+        switch (opcao){
+
+            case 1:      // inserir Equipamento
+                printf("Codigo: ");
+                scanf("%s", codigoM);
+
+                vcodigoM=verificarCodigo(Equip,quantidade,codigoM);
+
+                while (vcodigoM==1){
+                    printf("Esse codigo ja existe\n");
+                    printf("Codigo: ");
+                    scanf("%s", codigoM);
+                    vcodigoM=verificarCodigo(Equip,quantidade,codigoM);
+                }
+
+                printf("Tipo: ");
+                scanf("%s", tipo);
+                printf("Autonomia: ");
+                scanf("%d", &autonomia);
+                printf("Custo: ");
+                scanf("%f", &custo);
+
+                minserido = inserirEquipamento(Equip,quantidade,codigoM,tipo,autonomia,custo);
+                if (minserido == 1)
+                {
+                    printf("Inserido!\n");
+                    quantidade++;
+                    livre++;
+
+                    EscreverFicheiroEquipamentos(Equip, quantidade); //escrever ficheiro equipamentos, j� com o este novo
+                }
+                else
+                    printf("Nao inserido!\n");
+
+                break;
